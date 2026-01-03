@@ -1,54 +1,58 @@
 import { GoogleGenAI } from "@google/genai";
 import { SYSTEM_INSTRUCTION } from '../constants';
 
-let ai: GoogleGenAI | null = null;
+// 1. Initialize once to save resources
+let genAIInstance: GoogleGenAI | null = null;
 
 const getAI = () => {
-  // strictly use process.env.API_KEY as per security guidelines
+  if (genAIInstance) return genAIInstance;
+
+  // 2. Vite uses import.meta.env to access variables.
+  // We check for the VITE_ version first.
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
-if (!apiKey) {
-  console.warn("API Key is missing. Check your Netlify Environment Variables.");
-}
-
-const genAI = new GoogleGenAI(apiKey);
-  return ai;
-};
-
-export const sendMessageToGemini = async (userMessage: string, history: {role: 'user' | 'model', text: string}[]): Promise<string> => {
-  // Check if key is available without exposing it
-  if (!process.env.API_KEY) {
-    console.warn("Gemini API Key is missing. AI features are disabled.");
-    return "DEMO_MODE: The AI assistant is currently offline. Please configure the API_KEY in your environment variables to enable live chat.";
+  if (!apiKey) {
+    console.error("CRITICAL: Gemini API Key is missing! Check Netlify Env Vars.");
+    return null;
   }
 
+  genAIInstance = new GoogleGenAI(apiKey);
+  return genAIInstance;
+};
+
+export const sendMessageToGemini = async (
+  userMessage: string, 
+  history: {role: 'user' | 'model', text: string}[]
+): Promise<string> => {
+  
   const genAI = getAI();
+  
+  // 3. Graceful fallback if the key is missing
   if (!genAI) {
-    return "System Error: Could not initialize AI client.";
+    return "The AI assistant is currently offline. (API Key missing in environment)";
   }
 
   try {
-    const model = 'gemini-3-flash-preview'; 
-    
-    // Create a context string from history
-    const conversationContext = history.map(h => `${h.role === 'user' ? 'Customer' : 'Assistant'}: ${h.text}`).join('\n');
-    const prompt = `
-    ${conversationContext}
-    Customer: ${userMessage}
-    Assistant:
-    `;
-
-    const response = await genAI.models.generateContent({
-      model: model,
-      contents: prompt,
-      config: {
-        systemInstruction: SYSTEM_INSTRUCTION,
-      }
+    // Use the latest stable model
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-1.5-flash",
+      systemInstruction: SYSTEM_INSTRUCTION 
     });
 
-    return response.text || "I couldn't generate a response. Please try again.";
+    // 4. Correct way to send history to the SDK
+    const chat = model.startChat({
+      history: history.map(item => ({
+        role: item.role,
+        parts: [{ text: item.text }],
+      })),
+    });
+
+    const result = await chat.sendMessage(userMessage);
+    const response = await result.response;
+    return response.text();
+
   } catch (error) {
     console.error("Gemini API Error:", error);
-    return "I'm having trouble connecting to the fleet database right now.";
+    return "I'm having trouble connecting to the fleet database right now. Please try again later.";
   }
 };
