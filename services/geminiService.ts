@@ -5,11 +5,13 @@ let ai: GoogleGenAI | null = null;
 
 const getAI = () => {
   // strictly use process.env.API_KEY as per security guidelines
-  const apiKey = process.env.API_KEY;
-  
-  if (!ai && apiKey) {
-    ai = new GoogleGenAI({ apiKey: apiKey });
-  }
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+
+if (!apiKey) {
+  console.warn("API Key is missing. Check your Netlify Environment Variables.");
+}
+
+const genAI = new GoogleGenAI(apiKey);
   return ai;
 };
 
