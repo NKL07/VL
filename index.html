@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#030304" />
+    <title>VL Rent a Car</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Outfit', 'sans-serif'],
+              mono: ['Space Grotesk', 'monospace'],
+            },
+            colors: {
+              vl: {
+                dark: '#030304', // Deepest Obsidian
+                surface: '#0A0A0C', // Tech Grey
+                accent: '#EAB308', // Electric Gold (Yellow-500 base)
+                subtle: '#27272a',
+                glass: 'rgba(255, 255, 255, 0.03)'
+              }
+            },
+            backgroundImage: {
+              'cyber-grid': 'linear-gradient(to right, #18181b 1px, transparent 1px), linear-gradient(to bottom, #18181b 1px, transparent 1px)',
+              'radial-fade': 'radial-gradient(circle at center, transparent 0%, #030304 100%)',
+            },
+            backgroundSize: {
+              'cyber-grid': '60px 60px',
+            },
+            keyframes: {
+              fadeInUp: {
+                '0%': { opacity: '0', transform: 'translateY(40px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              },
+              scaleIn: {
+                 '0%': { opacity: '0', transform: 'scale(0.9)' },
+                 '100%': { opacity: '1', transform: 'scale(1)' },
+              },
+              shimmer: {
+                '0%': { transform: 'translateX(-100%)' },
+                '100%': { transform: 'translateX(100%)' }
+              },
+              marquee: {
+                '0%': { transform: 'translateX(0)' },
+                '100%': { transform: 'translateX(-50%)' },
+              },
+              float: {
+                '0%, 100%': { transform: 'translateY(0)' },
+                '50%': { transform: 'translateY(-15px)' },
+              },
+              'pulse-ring': {
+                '0%': { transform: 'scale(0.8)', opacity: '0.5' },
+                '100%': { transform: 'scale(2)', opacity: '0' },
+              },
+              'glitch-anim': {
+                '0%': { clipPath: 'inset(40% 0 61% 0)' },
+                '20%': { clipPath: 'inset(92% 0 1% 0)' },
+                '40%': { clipPath: 'inset(43% 0 1% 0)' },
+                '60%': { clipPath: 'inset(25% 0 58% 0)' },
+                '80%': { clipPath: 'inset(54% 0 7% 0)' },
+                '100%': { clipPath: 'inset(58% 0 43% 0)' },
+              },
+              'scanline': {
+                '0%': { transform: 'translateY(-100%)' },
+                '100%': { transform: 'translateY(100%)' }
+              },
+              'grid-flow': {
+                '0%': { backgroundPosition: '0 0' },
+                '100%': { backgroundPosition: '60px 60px' },
+              }
+            },
+            animation: {
+              'fade-in-up': 'fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+              'scale-in': 'scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+              'shimmer': 'shimmer 2s infinite',
+              'marquee': 'marquee 30s linear infinite',
+              'float': 'float 6s ease-in-out infinite',
+              'pulse-ring': 'pulse-ring 3s cubic-bezier(0.215, 0.61, 0.355, 1) infinite',
+              'grid-flow': 'grid-flow 4s linear infinite',
+              'scanline': 'scanline 8s linear infinite',
+            },
+            screens: {
+              'xs': '480px',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        background-color: #030304;
+        color: #e4e4e7;
+        -webkit-tap-highlight-color: transparent;
+        overflow-x: hidden;
+      }
+      
+      html { scroll-behavior: smooth; }
+
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-track { background: #030304; }
+      ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
+      ::-webkit-scrollbar-thumb:hover { background: #EAB308; }
+
+      .reveal {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+        transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .reveal.active {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+
+      /* Glitch Effect */
+      .glitch {
+        position: relative;
+      }
+      .glitch::before, .glitch::after {
+        content: attr(data-text);
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #030304;
+      }
+      .glitch::before {
+        left: 2px;
+        text-shadow: -1px 0 #EAB308;
+        clip-path: inset(0 0 0 0);
+        animation: glitch-anim 3s infinite linear alternate-reverse;
+      }
+      .glitch::after {
+        left: -2px;
+        text-shadow: -1px 0 #00ffff;
+        clip-path: inset(0 0 0 0);
+        animation: glitch-anim 2s infinite linear alternate-reverse;
+      }
+
+      /* Glassmorphism */
+      .glass-panel {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      /* Scanlines */
+      .scanlines {
+        background: linear-gradient(
+          to bottom,
+          rgba(255,255,255,0),
+          rgba(255,255,255,0) 50%,
+          rgba(0,0,0,0.1) 50%,
+          rgba(0,0,0,0.1)
+        );
+        background-size: 100% 4px;
+        position: fixed;
+        pointer-events: none;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 9999;
+        opacity: 0.15;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+    <div class="scanlines"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
